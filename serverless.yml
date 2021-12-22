@@ -1,13 +1,23 @@
-service: cloudfront-service
+service: FeatureflowLambdaAtEdge
 
 provider:
   name: aws
-  runtime: nodejs10.x
+  runtime: nodejs14.x
+  region: us-east-1
 
 functions:
-  cfLambda:
-    handler: functions/handler.cloudfront
+  redirect:
+    handler: handler.handler # <filename>.<exported-function>
     events:
       - cloudFront:
           eventType: origin-request
-          origin: https://app.acme.com
+          origin: http://featureflow-redirect-example.s3-website-us-east-1.amazonaws.com
+
+
+plugins:
+  - serverless-plugin-tree-shake
+  #- serverless-plugin-optimize
+
+
+package:
+  excludeDevDependencies: false

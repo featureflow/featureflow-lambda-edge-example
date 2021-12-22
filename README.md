@@ -1,68 +1,114 @@
-# lambda-edge-example
-An example of using featureflow in lambda @ edge
+# Example Node.JS Lambda@Edge blue/green deployment using featureflow 
 
-Featureflow controls are incredibly powerful at directing logic within an application, they may be employed at any point in the application
-stack and in multiple languages.
+A simple application written in Node.JS with the serverless framework and featureflow that runs on AWS Lambda@Edge.
 
-However, there are times, such as when deploying a complete re-write of an application, 
-that you may wish to deploy the application as a separate resource, and manage the release as a load-balanced green-blue deployment.
+This application uses featureflow to redirect the user to one endpoint or another based on header values.
 
-A way to do this is to include the redirect logic in a Lambda@Edge function.
+## Requirements
 
-Featureflow provides a simple way to do this by adding real time control to a Lambda@Edge function. 
+ - An AWS account that is set up
+ - A cloudfront distribution (as we would like to trigger it on `origin-response`)
+ - [Serverless framework](https://serverless.com/framework/docs/getting-started/)
 
-This example show how to use featureflow to control 302 redirects based on specific headers.
+ ## IAM Role for the function
 
-We will use the serverless framework to deploy the application, serverless greatly simplifies the creation and deployment of lambda functions.
+ The function has a very basic IAM role set up that will be created by `serverless`. The role has access to write to CloudWatch logs and it can be assumed by `lambda` and `edgelambda` services. For production, the logs should be more restrictive than the AWS managed `AWSLambdaBasicExecutionRole`.
 
-A lambda @ edge function is deployed to cloudfront which will redirect based on a feature flag
+## Set your environment SDK key
+Replace `{apiKey: 'sdk-srv-env-YOUR-KEY'}` in `handler.js` with your Server Environment SDK Key.
 
-    Request
-        |
-    featureflow-edge
-    |           |
-    blue   green
+If you don't have a featureflow account - head to https://app.featureflow.io and sign up, it only takes 1 minute.
 
-### Blue Green Static Deployments
-Web Blue and Web Green are very simple deployments, 
-serverless creates a cloudfront distribution for each.
+## How to deploy
 
-The cloudfront distribution points to an s3 bucket which contains the contents of the build directory.
+ Set up a profile that has access to create cloudformation templates, access S3 etc. Please check the relevant [documentation of serverless](https://serverless.com/framework/docs/providers/aws/guide/credentials/).
 
-Each deployment has a unique domain name, `serverless deploy` gives a summary, e.g:
+```bash
+serverless deploy --aws-profile=my-profile-name
+```
 
-```shell
-bucket:          website-whwv1y
-distributionUrl: https://d2p2be3uxw9rcw.cloudfront.net
-bucketUrl:       http://website-whwv1y.s3-website.us-east-1.amazonaws.com
-url:             https://d2p2be3uxw9rcw.cloudfront.net
+The command above will deploy the lambda function. For Lambda@Edge it is important to deploy to `us-east-1` as that is where the function will be distributed to CloudFront.
 
+## Test
+In the lambda view click 'test' and create an event, for example:
+
+```json
+{
+  "Records": [
+    {
+      "cf": {
+        "config": {
+          "distributionId": "EXAMPLE"
+        },
+        "request": {
+          "uri": "/",
+          "method": "GET",
+          "clientIp": "2001:cdba::3257:9652",
+          "headers": {
+            "cloudfront-viewer-country": [
+              {
+                "key": "US",
+                "value": "US"
+              }
+            ],
+            "x-cohort": [
+              {
+                "key": "beta",
+                "value": "beta"
+              }
+            ],            
+            "user-agent": [
+              {
+                "key": "User-Agent",
+                "value": "Test Agent"
+              }
+            ],
+            "host": [
+              {
+                "key": "Host",
+                "value": "d123.cf.net"
+              }
+            ],
+            "cookie": [
+              {
+                "key": "Cookie",
+                "value": "SomeCookie=1; AnotherOne=A; X-Experiment-Name=B"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
 ```
 
 
-### Lambda @ Edge deployment
-The edge deployment will too have it's own url, and a cloudfront distribution.
+## Trigger from CloudFront
 
-It will contain a lambda function which will be triggered by a cloudfront event.
+On the AWS console for Lambda, find the function and click on _Deploy to Lambda@Edge_. On the next screen you will need to select which distrbitution you are deploying to and on which event, select `viewer request` event - viewer request is evaluated before the cache is hit, selecting otherwise would cause the cache to return with the first selected variant.
 
-This lambda function will be triggered by a cloudfront event, and will return a redirect to the correct blue/green deployment URL.
+### First step
+![Deploy first step](./assets/deploy-1.png "Deploy first step")
 
-# Build and deploy
-```shell
-cd web-blue
-npm build
-serverless deploy
-```
+### Second step
+![Deploy second step](./assets/deploy-2.png "Deploy second step")
 
-```shell
-cd web-green
-npm build
-serverless deploy
-```
+After the function is deployed make a request to the cloudfront url, you should be redirected to the failover endpoint.
 
-```shell
-cd featureflow-edge
-npm build
-serverless deploy
-```
+Note that the logs will be written to a region that is close to the CDN edge node that is serving you. For example even though the Lambda is in `us-east-1` it is now deployed throughout the distribution and if you are in France for example the logs of the edge function will be written to the Paris region.
+
+## Configure featureflow
+
+Create a feature in the featureflow console with a matching key (for example `lambda-redirect`)
+
+If you wish, you can create custom variants to better reflext your redirect rules:
+
+![Featureflow Variants](./assets/featureflow-define-variants.png "Define featureflow variants")
+
+Then you can target the variants using rules based on the user attributes obtained from the header and cookie values:
+
+![Featureflow Targeting](./assets/featureflow-define-targeting.png "Define featureflow targeting rules")
+
+
 
