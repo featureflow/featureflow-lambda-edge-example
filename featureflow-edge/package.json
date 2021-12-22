@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "featureflow-node-sdk": "0.6.9-alpha"
+  },
+  "devDependencies": {
+    "serverless-plugin-tree-shake": "^1.1.11"
+  }
+}

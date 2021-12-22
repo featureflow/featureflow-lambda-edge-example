@@ -1,0 +1,13 @@
+service: cloudfront-service
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+
+functions:
+  cfLambda:
+    handler: functions/handler.cloudfront
+    events:
+      - cloudFront:
+          eventType: origin-request
+          origin: https://app.acme.com

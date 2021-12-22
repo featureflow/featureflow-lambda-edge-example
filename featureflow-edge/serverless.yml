@@ -1,0 +1,23 @@
+service: FeatureflowLambdaAtEdge
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: us-east-1
+
+functions:
+  redirect:
+    handler: handler.handler # <filename>.<exported-function>
+    events:
+      - cloudFront:
+          eventType: origin-request
+          origin: http://featureflow-redirect-example.s3-website-us-east-1.amazonaws.com
+
+
+plugins:
+  - serverless-plugin-tree-shake
+  #- serverless-plugin-optimize
+
+
+package:
+  excludeDevDependencies: false
