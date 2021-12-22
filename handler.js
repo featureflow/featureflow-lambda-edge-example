@@ -15,9 +15,7 @@ exports.handler = async (event) => {
       .withAttributes('role', ['USER_ADMIN', 'BETA_CUSTOMER'])
       .build();
   await featureflow.waitForReady();
-  let response = {
-    statusCode: 200,
-  };
+  let response;
   if (featureflow.evaluate('lambda-redirect', user).is("app-featureflow")){
     response = {
       status: '302',

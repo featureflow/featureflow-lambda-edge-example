@@ -86,7 +86,11 @@ In the lambda view click 'test' and create an event, for example:
 
 ## Trigger from CloudFront
 
-On the AWS console for Lambda, find the function and click on _Deploy to Lambda@Edge_. On the next screen you will need to select which distrbitution you are deploying to and on which event, select `viewer request` event - viewer request is evaluated before the cache is hit, selecting otherwise would cause the cache to return with the first selected variant.
+On the AWS console for Lambda, find the function and click on _Deploy to Lambda@Edge_. 
+
+On the next screen you will need to select which distribution you are deploying to and on which event, select `viewer request` event.
+
+Viewer request is evaluated _before_ the cache is hit, otherwise the cache would continue to return with the first evaluated variant.
 
 ### First step
 ![Deploy first step](./assets/deploy-1.png "Deploy first step")
@@ -102,7 +106,7 @@ Note that the logs will be written to a region that is close to the CDN edge nod
 
 Create a feature in the featureflow console with a matching key (for example `lambda-redirect`)
 
-If you wish, you can create custom variants to better reflext your redirect rules:
+If you wish, you can create custom variants to better reflect your redirect rules:
 
 ![Featureflow Variants](./assets/featureflow-define-variants.png "Define featureflow variants")
 
