@@ -4,6 +4,8 @@ A simple application written in Node.JS with the serverless framework and featur
 
 This application uses featureflow to redirect the user to one endpoint or another based on header values.
 
+See in action at https://www.youtube.com/watch?v=VbcLbwJirGo
+
 ## Requirements
 
  - An AWS account that is set up
