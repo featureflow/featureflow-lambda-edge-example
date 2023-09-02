@@ -16,7 +16,7 @@ exports.handler = async (event) => {
       .build();
   await featureflow.waitForReady();
   let response;
-  if (featureflow.evaluate('lambda-redirect', user).is("old")){
+  if (featureflow.evaluate('lambda-redirect', user).is("original")){
     response = {
       status: '302',
       statusDescription: 'Found',
