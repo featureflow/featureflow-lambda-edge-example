@@ -14,7 +14,7 @@ See in action at https://www.youtube.com/watch?v=VbcLbwJirGo
 
  ## IAM Role for the function
 
- The function has a very basic IAM role set up that will be created by `serverless`. The role has access to write to CloudWatch logs and it can be assumed by `lambda` and `edgelambda` services. For production, the logs should be more restrictive than the AWS managed `AWSLambdaBasicExecutionRole`.
+The function has a very basic IAM role set up that will be created by `serverless`. The role has access to write to CloudWatch logs and it can be assumed by `lambda` and `edgelambda` services. For production, the logs should be more restrictive than the AWS managed `AWSLambdaBasicExecutionRole`.
 
 ## Set your environment SDK key
 Replace `{apiKey: 'sdk-srv-env-YOUR-KEY'}` in `handler.js` with your Server Environment SDK Key.
