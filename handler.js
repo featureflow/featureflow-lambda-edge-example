@@ -16,25 +16,25 @@ exports.handler = async (event) => {
       .build();
   await featureflow.waitForReady();
   let response;
-  if (featureflow.evaluate('lambda-redirect', user).is("app-featureflow")){
+  if (featureflow.evaluate('lambda-redirect', user).is("old")){
     response = {
       status: '302',
       statusDescription: 'Found',
       headers: {
         location: [{
           key: 'Location',
-          value: 'https://app.featureflow.io'
+          value: 'https://featureflow.io'
         }],
       },
     };
-  }else if (featureflow.evaluate('lambda-redirect', user).is("www-featureflow")){
+  }else if (featureflow.evaluate('lambda-redirect', user).is("new")){
     response = {
       status: '302',
       statusDescription: 'Found',
       headers: {
         location: [{
           key: 'Location',
-          value: 'https://www.featureflow.io'
+          value: 'https://featureflow.com'
         }],
       },
     };
@@ -45,7 +45,7 @@ exports.handler = async (event) => {
       headers: {
         location: [{
           key: 'Location',
-          value: 'https://www.featureflow.com/',
+          value: 'https://www.featureflow.io/',
         }],
       },
     };
