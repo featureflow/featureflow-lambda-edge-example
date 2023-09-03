@@ -116,5 +116,7 @@ Then you can target the variants using rules based on the user attributes obtain
 
 ![Featureflow Targeting](./assets/featureflow-define-targeting.png "Define featureflow targeting rules")
 
+See https://docs.featureflow.io/using-featureflow-with-aws-lambda for more details.
+
 
 
