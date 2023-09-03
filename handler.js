@@ -16,6 +16,8 @@ exports.handler = async (event) => {
       .build();
   await featureflow.waitForReady();
   let response;
+  const evaluated = featureflow.evaluate('lambda-redirect', user).value();
+  console.log(`Featureflow has evaluated: ${evaluated}`);
   if (featureflow.evaluate('lambda-redirect', user).is("original")){
     response = {
       status: '302',
