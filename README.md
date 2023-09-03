@@ -118,5 +118,7 @@ Then you can target the variants using rules based on the user attributes obtain
 
 See https://docs.featureflow.io/using-featureflow-with-aws-lambda for more details.
 
+See https://www.youtube.com/watch?v=VbcLbwJirGo for a 2-minute video example
+
 
 
