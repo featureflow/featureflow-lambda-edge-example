@@ -11,7 +11,7 @@
     "invoke:warm": "npm run build:dist && node scripts/invoke-warm.js"
   },
   "dependencies": {
-    "featureflow-node-sdk": "^0.6.18"
+    "featureflow-node-sdk": "^0.6.19"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.145",
