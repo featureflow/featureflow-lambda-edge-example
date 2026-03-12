@@ -4,6 +4,7 @@
     "build": "tsc --noEmit",
     "build:dist": "tsc",
     "deploy": "serverless deploy",
+    "deploy:function": "serverless deploy function -f redirect",
     "invoke:local": "serverless invoke local -f redirect -p events/cloudfront-request.json",
     "invoke:warm": "npm run build:dist && node scripts/invoke-warm.js"
   },
