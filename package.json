@@ -5,11 +5,13 @@
     "build:dist": "tsc",
     "deploy": "serverless deploy",
     "deploy:function": "serverless deploy function -f redirect",
+    "deploy:function:features": "serverless deploy function -f features",
     "invoke:local": "serverless invoke local -f redirect -p events/cloudfront-request.json",
+    "invoke:local:features": "serverless invoke local -f features -p events/cloudfront-request.json",
     "invoke:warm": "npm run build:dist && node scripts/invoke-warm.js"
   },
   "dependencies": {
-    "featureflow-node-sdk": "^0.6.16"
+    "featureflow-node-sdk": "^0.6.18"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.145",

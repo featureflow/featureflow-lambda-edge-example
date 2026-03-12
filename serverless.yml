@@ -16,6 +16,16 @@ functions:
       - cloudFront:
           eventType: origin-request
           origin: http://featureflow-redirect-example.s3-website-us-east-1.amazonaws.com
+          # Default path pattern: handles all requests not matched by other behaviors
+
+  features:
+    handler: src/features-handler.handler
+    events:
+      - cloudFront:
+          eventType: origin-request
+          origin: http://featureflow-redirect-example.s3-website-us-east-1.amazonaws.com
+          pathPattern: /api/features*
+          # Requests to /api/features (and subpaths) use this behavior; others use redirect
 
 
 # TypeScript is compiled automatically by Serverless v4 built-in esbuild (serverless dev, invoke local, deploy)

@@ -1,6 +1,9 @@
 # Featureflow Lambda@Edge example
 
-A minimal TypeScript example using [Featureflow](https://featureflow.com) with AWS Lambda@Edge and the Serverless framework. The function redirects users to different URLs based on feature variants and request headers (e.g. country, cohort).
+A minimal TypeScript example using [Featureflow](https://featureflow.com) with AWS Lambda@Edge and the Serverless framework. Two functions:
+
+- **redirect** — Redirects users to different URLs based on the `lambda-redirect` feature variant and request headers (e.g. country, cohort).
+- **features** — Returns all evaluated features for the request as JSON (same user/headers, no redirect).
 
 See in action at https://www.youtube.com/watch?v=VbcLbwJirGo
 
@@ -12,7 +15,8 @@ See in action at https://www.youtube.com/watch?v=VbcLbwJirGo
 
 ## Project structure
 
-- `src/handler.ts` — Lambda@Edge handler (TypeScript). Compiled automatically by Serverless v4’s built-in esbuild during `serverless dev`, `serverless invoke local`, and `serverless deploy`.
+- `src/handler.ts` — Redirect Lambda@Edge: evaluates `lambda-redirect` and returns a 302. Self-contained Featureflow setup.
+- `src/features-handler.ts` — Features Lambda@Edge: returns all evaluated features as JSON (`{ features: { "key": "variant", ... } }`). Self-contained Featureflow setup.
 - `serverless.yml` — Serverless, Lambda@Edge, and build (esbuild) configuration.
 
 ## IAM Role for the function
@@ -21,12 +25,10 @@ The function has a very basic IAM role set up that will be created by `serverles
 
 ## Set your Server API key
 
-Set the `FEATUREFLOW_SERVER_KEY` environment variable to your Server API key, or replace the default in `src/handler.ts`:
+Set the `FEATUREFLOW_SERVER_KEY` environment variable to your Server API key, or replace the default in each handler (`src/handler.ts` and `src/features-handler.ts`):
 
 ```ts
-const featureflow = new Featureflow.Client({
-  apiKey: process.env.FEATUREFLOW_SERVER_KEY ?? 'srv-env-YOUR_SERVER_ENVIRONMENT_KEY',
-});
+apiKey: process.env.FEATUREFLOW_SERVER_KEY ?? 'sdk-srv-env-YOUR-KEY',
 ```
 
 Sign up at [app.featureflow.com](https://app.featureflow.com) if you don’t have an account.
@@ -61,11 +63,17 @@ Because this is a **Lambda@Edge** (CloudFront) function, it isn’t triggered by
 
 **1. Invoke with a local event file:**
 
+Redirect (302 response):
 ```bash
 sls invoke local -f redirect -p events/cloudfront-request.json
 ```
-
 Or: `npm run invoke:local`
+
+All evaluated features (200 + JSON):
+```bash
+sls invoke local -f features -p events/cloudfront-request.json
+```
+Or: `npm run invoke:local:features`
 
 To test **warm** invocations (one Node process, handler called repeatedly so the Featureflow client stays hot), run `npm run invoke:warm`. It compiles with `tsc`, loads the handler once, then invokes it every second (or set `INVOKE_INTERVAL_MS=2000` for 2s). Press Ctrl+C to stop. This avoids the hang you get when running `serverless invoke local` in a loop.
 
@@ -77,7 +85,7 @@ Running `serverless dev` compiles TypeScript via the built-in esbuild, connects 
 
 **3. After deploy (real “REST” call)**
 
-Once deployed and attached to a CloudFront distribution, the function runs on every matching request. The only way to “REST invoke” it is to send a request to your **CloudFront URL** (e.g. `https://your-distribution-id.cloudfront.net/`). The edge function then runs and can return the redirect response.
+Once deployed and attached to a CloudFront distribution, the function runs on every matching request. The **redirect** function is the default behavior (all paths). The **features** function is attached to the path pattern `/api/features*`, so request `https://your-distribution-id.cloudfront.net/api/features` to get the JSON of all evaluated features.
 
 ## Test event (AWS Console)
 

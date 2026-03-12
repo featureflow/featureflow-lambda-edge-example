@@ -2,28 +2,22 @@ import Featureflow from 'featureflow-node-sdk';
 import type { CloudFrontRequestEvent, CloudFrontResultResponse } from 'aws-lambda';
 
 const featureflow = new Featureflow.Client({
-  apiKey: process.env.FEATUREFLOW_SERVER_KEY ?? 'srv-env-YOUR_SERVER_ENVIRONMENT_KEY',
+  apiKey: process.env.FEATUREFLOW_SERVER_KEY ?? 'sdk-srv-env-054a632e4fc34ca08acda979ed3914d9',
 });
-
-const REDIRECT_URLS: Record<string, string> = {
-  original: 'https://featureflow.io',
-  new: 'https://featureflow.com',
-};
-
-const DEFAULT_URL = 'https://www.featureflow.io/';
 
 function getHeader(headers: CloudFrontRequestEvent['Records'][0]['cf']['request']['headers'], name: string): string {
   const entry = headers[name.toLowerCase()];
   return entry?.[0]?.value ?? '';
 }
 
-function redirectResponse(location: string): CloudFrontResultResponse {
+function jsonResponse(body: Record<string, unknown>): CloudFrontResultResponse {
   return {
-    status: '302',
-    statusDescription: 'Found',
+    status: '200',
+    statusDescription: 'OK',
     headers: {
-      location: [{ key: 'Location', value: location }],
+      'content-type': [{ key: 'Content-Type', value: 'application/json' }],
     },
+    body: JSON.stringify(body),
   };
 }
 
@@ -44,10 +38,7 @@ export const handler = async (event: CloudFrontRequestEvent): Promise<CloudFront
     featureflow.ready(((err?: Error | null) => (err ? reject(err) : resolve())) as () => void);
   });
 
-  const variant = (featureflow as { evaluate(key: string, user?: unknown): { value(): string } })
-    .evaluate('lambda-redirect', user)
-    .value();
-  const location = REDIRECT_URLS[variant] ?? DEFAULT_URL;
+  const features = (featureflow as { evaluateAll(user?: unknown): Record<string, string> }).evaluateAll(user);
 
-  return redirectResponse(location);
+  return jsonResponse({ features });
 };
