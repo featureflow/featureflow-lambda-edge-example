@@ -6,7 +6,7 @@ app: featureflow-lambda-edge
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs20.x
   region: us-east-1
 
 functions:
@@ -22,7 +22,7 @@ functions:
 build:
   esbuild:
     bundle: true
-    target: node14
+    target: node20
     sourcemap: true
 
 package:

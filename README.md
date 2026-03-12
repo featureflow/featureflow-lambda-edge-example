@@ -6,7 +6,7 @@ See in action at https://www.youtube.com/watch?v=VbcLbwJirGo
 
 ## Requirements
 
-- Node.js 14+
+- Node.js 20+
 - An AWS account and a CloudFront distribution (this example uses the `origin-request` event)
 - [Serverless Framework](https://serverless.com/framework/docs/getting-started/)
 
