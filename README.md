@@ -1,6 +1,6 @@
 # Featureflow Lambda@Edge example
 
-A minimal TypeScript example using [Featureflow](https://featureflow.io) with AWS Lambda@Edge and the Serverless framework. The function redirects users to different URLs based on feature variants and request headers (e.g. country, cohort).
+A minimal TypeScript example using [Featureflow](https://featureflow.com) with AWS Lambda@Edge and the Serverless framework. The function redirects users to different URLs based on feature variants and request headers (e.g. country, cohort).
 
 See in action at https://www.youtube.com/watch?v=VbcLbwJirGo
 
