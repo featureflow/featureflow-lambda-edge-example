@@ -1,7 +1,7 @@
 service: FeatureflowLambdaAtEdge
 
 # Serverless Dashboard: set org and app (from app.serverless.com), then deploy with SERVERLESS_ACCESS_KEY set
-org: oliveroldfield
+org: myorg
 app: featureflow-lambda-edge
 
 provider:
