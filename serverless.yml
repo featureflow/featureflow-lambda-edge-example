@@ -1,5 +1,9 @@
 service: FeatureflowLambdaAtEdge
 
+# Serverless Dashboard: set org and app (from app.serverless.com), then deploy with SERVERLESS_ACCESS_KEY set
+org: oliveroldfield
+app: featureflow-lambda-edge
+
 provider:
   name: aws
   runtime: nodejs14.x
@@ -7,17 +11,19 @@ provider:
 
 functions:
   redirect:
-    handler: handler.handler # <filename>.<exported-function>
+    handler: src/handler.handler
     events:
       - cloudFront:
           eventType: origin-request
           origin: http://featureflow-redirect-example.s3-website-us-east-1.amazonaws.com
 
 
-plugins:
-  - serverless-plugin-tree-shake
-  #- serverless-plugin-optimize
-
+# TypeScript is compiled automatically by Serverless v4 built-in esbuild (serverless dev, invoke local, deploy)
+build:
+  esbuild:
+    bundle: true
+    target: node14
+    sourcemap: true
 
 package:
   excludeDevDependencies: false
