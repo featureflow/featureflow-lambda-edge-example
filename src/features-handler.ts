@@ -25,13 +25,12 @@ export const handler = async (event: CloudFrontRequestEvent): Promise<CloudFront
   const request = event.Records[0].cf.request;
   const headers = request.headers;
 
+  // Simple example user using known CloudFront header (same as handler.ts)
   const country = getHeader(headers, 'cloudfront-viewer-country') || 'US';
-  const cohort = getHeader(headers, 'x-cohort') || 'none';
 
-  const user = new Featureflow.UserBuilder('anonymous')
+  const user = new Featureflow.UserBuilder('user-123')
     .withAttribute('country', country)
-    .withAttribute('cohort', cohort)
-    .withAttributes('role', ['USER_ADMIN', 'BETA_CUSTOMER'])
+    .withAttribute('plan', 'pro')
     .build();
 
   await new Promise<void>((resolve, reject) => {

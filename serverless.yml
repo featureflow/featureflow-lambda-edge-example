@@ -1,7 +1,7 @@
 service: FeatureflowLambdaAtEdge
 
 # Serverless Dashboard: set org and app (from app.serverless.com), then deploy with SERVERLESS_ACCESS_KEY set
-org: myorg
+org: oliveroldfield
 app: featureflow-lambda-edge
 
 provider:
@@ -11,7 +11,7 @@ provider:
 
 functions:
   redirect:
-    handler: src/handler.handler
+    handler: dist/handler.handler
     events:
       - cloudFront:
           eventType: origin-request
@@ -19,7 +19,7 @@ functions:
           # Default path pattern: handles all requests not matched by other behaviors
 
   features:
-    handler: src/features-handler.handler
+    handler: dist/features-handler.handler
     events:
       - cloudFront:
           eventType: origin-request
@@ -28,12 +28,10 @@ functions:
           # Requests to /api/features (and subpaths) use this behavior; others use redirect
 
 
-# TypeScript is compiled automatically by Serverless v4 built-in esbuild (serverless dev, invoke local, deploy)
+# Lambda@Edge does not allow environment variables. Serverless v4's built-in esbuild adds env vars
+# (e.g. for source maps), so we disable it and compile TypeScript ourselves (npm run build:dist).
 build:
-  esbuild:
-    bundle: true
-    target: node20
-    sourcemap: true
+  esbuild: false
 
 package:
   excludeDevDependencies: false

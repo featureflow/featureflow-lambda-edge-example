@@ -3,7 +3,7 @@
   "scripts": {
     "build": "tsc --noEmit",
     "build:dist": "tsc",
-    "deploy": "serverless deploy",
+    "deploy": "npm run build:dist && serverless deploy",
     "deploy:function": "serverless deploy function -f redirect",
     "deploy:function:features": "serverless deploy function -f features",
     "invoke:local": "serverless invoke local -f redirect -p events/cloudfront-request.json",

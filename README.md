@@ -15,9 +15,9 @@ See in action at https://www.youtube.com/watch?v=VbcLbwJirGo
 
 ## Project structure
 
-- `src/handler.ts` — Redirect Lambda@Edge: evaluates `lambda-redirect` and returns a 302. Self-contained Featureflow setup.
-- `src/features-handler.ts` — Features Lambda@Edge: returns all evaluated features as JSON (`{ features: { "key": "variant", ... } }`). Self-contained Featureflow setup.
-- `serverless.yml` — Serverless, Lambda@Edge, and build (esbuild) configuration.
+- `src/handler.ts` — Redirect handler source; compiled to `dist/handler.js`. Self-contained Featureflow setup.
+- `src/features-handler.ts` — Features handler source; compiled to `dist/features-handler.js`. Returns all evaluated features as JSON. Self-contained Featureflow setup.
+- `serverless.yml` — Serverless and Lambda@Edge configuration. Build is disabled (esbuild: false) so no env vars are added—Lambda@Edge does not support them.
 
 ## IAM Role for the function
 
@@ -35,16 +35,18 @@ Sign up at [app.featureflow.com](https://app.featureflow.com) if you don’t hav
 
 ## Build and deploy
 
-Install dependencies, then deploy. TypeScript is compiled automatically by Serverless’s built-in esbuild (no separate build step):
+Install dependencies, build TypeScript to `dist/`, then deploy:
 
 ```bash
 npm install
 npm run deploy
 ```
 
+(`deploy` runs `build:dist` then `serverless deploy`. Handlers live in `dist/` because Lambda@Edge cannot have environment variables, so Serverless’s built-in build is disabled.)
+
 Or deploy with a profile: `serverless deploy --aws-profile=your-profile`.
 
-Use an AWS profile with permission to create CloudFormation stacks, S3 buckets, etc. See the [Serverless AWS credentials docs](https://serverless.com/framework/docs/providers/aws/guide/credentials/). Lambda@Edge must be deployed in **us-east-1**. Run `npm run build` to type-check only (no output).
+Use an AWS profile with permission to create CloudFormation stacks, S3 buckets, etc. See the [Serverless AWS credentials docs](https://serverless.com/framework/docs/providers/aws/guide/credentials/). Lambda@Edge must be deployed in **us-east-1**. Run `npm run build` to type-check only; run `npm run build:dist` before `invoke local` if you changed code.
 
 ## Serverless Dashboard
 
@@ -59,7 +61,7 @@ See the [Dashboard setup guide](https://www.serverless.com/framework/docs/guides
 
 ## Invoke locally
 
-Because this is a **Lambda@Edge** (CloudFront) function, it isn’t triggered by a normal HTTP URL. You test the handler by invoking it with a CloudFront-style event. Serverless’s built-in esbuild compiles TypeScript automatically—no separate build step.
+Because this is a **Lambda@Edge** (CloudFront) function, it isn’t triggered by a normal HTTP URL. You test the handler by invoking it with a CloudFront-style event. Run `npm run build:dist` first so `dist/` is up to date.
 
 **1. Invoke with a local event file:**
 
@@ -81,7 +83,7 @@ You should see the function’s response (e.g. a 302 with `Location` header) pri
 
 **2. With `serverless dev`**
 
-Running `serverless dev` compiles TypeScript via the built-in esbuild, connects to the Serverless Dashboard, and streams logs. It does **not** start a local HTTP endpoint for this service, since the function is only triggered by CloudFront. Use `sls invoke local` as above to run the handler with a test event.
+Running `serverless dev` connects to the Serverless Dashboard and streams logs. Run `npm run build:dist` when you change code so `dist/` is current. It does **not** start a local HTTP endpoint for this service, since the function is only triggered by CloudFront. Use `sls invoke local` as above to run the handler with a test event.
 
 **3. After deploy (real “REST” call)**
 
